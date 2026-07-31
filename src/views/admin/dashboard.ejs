@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telegram Subscription Bot Admin</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div>
+          <h1>Telegram Subscription Bot</h1>
+          <p class="muted">Customize menus, plans, payment flow, and access delivery.</p>
+        </div>
+        <form method="post" action="/admin/logout">
+          <button type="submit" class="button-secondary">Logout</button>
+        </form>
+      </div>
+
+      <div class="grid">
+        <section class="card">
+          <h2>Bot Settings</h2>
+          <form method="post" action="/admin/settings">
+            <label>Bot Name</label>
+            <input name="botName" value="<%= settings.botName %>" required />
+
+            <label>Welcome Message</label>
+            <textarea name="welcomeMessage" required><%= settings.welcomeMessage %></textarea>
+
+            <label>Plans Title</label>
+            <textarea name="plansTitle" required><%= settings.plansTitle %></textarea>
+
+            <label>Payment Instructions</label>
+            <textarea name="paymentInstructions" required><%= settings.paymentInstructions %></textarea>
+
+            <label>Support Text</label>
+            <textarea name="supportText" required><%= settings.supportText %></textarea>
+
+            <label>Approval Message</label>
+            <textarea name="successMessage" required><%= settings.successMessage %></textarea>
+
+            <label>Rejection Message</label>
+            <textarea name="rejectionMessage" required><%= settings.rejectionMessage %></textarea>
+
+            <label>Admin Chat ID</label>
+            <input name="adminChatId" value="<%= settings.adminChatId %>" required />
+
+            <label>Private Channel ID</label>
+            <input name="privateChannelId" value="<%= settings.privateChannelId %>" required />
+
+            <button type="submit">Save Settings</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Plans</h2>
+          <p class="muted">Create and edit subscription offers displayed in the Telegram bot.</p>
+          <% plans.forEach((plan) => { %>
+            <form method="post" action="/admin/plans">
+              <input type="hidden" name="id" value="<%= plan.id %>" />
+              <div class="two-columns">
+                <div>
+                  <label>Name</label>
+                  <input name="name" value="<%= plan.name %>" required />
+                </div>
+                <div>
+                  <label>Price Label</label>
+                  <input name="priceLabel" value="<%= plan.priceLabel %>" required />
+                </div>
+              </div>
+              <label>Description</label>
+              <textarea name="description" required><%= plan.description %></textarea>
+              <div class="two-columns">
+                <div>
+                  <label>Duration Days</label>
+                  <input name="durationDays" type="number" value="<%= plan.durationDays %>" required />
+                </div>
+                <div>
+                  <label>Sort Order</label>
+                  <input name="sortOrder" type="number" value="<%= plan.sortOrder %>" required />
+                </div>
+              </div>
+              <label>
+                <input name="isActive" type="checkbox" <%= plan.isActive ? "checked" : "" %> />
+                Active
+              </label>
+              <button type="submit">Save Plan</button>
+            </form>
+            <form method="post" action="/admin/plans/<%= plan.id %>/delete">
+              <button type="submit" class="button-danger">Delete</button>
+            </form>
+            <hr />
+          <% }) %>
+
+          <h3>Add Plan</h3>
+          <form method="post" action="/admin/plans">
+            <div class="two-columns">
+              <div>
+                <label>Name</label>
+                <input name="name" required />
+              </div>
+              <div>
+                <label>Price Label</label>
+                <input name="priceLabel" required />
+              </div>
+            </div>
+            <label>Description</label>
+            <textarea name="description" required></textarea>
+            <div class="two-columns">
+              <div>
+                <label>Duration Days</label>
+                <input name="durationDays" type="number" value="30" required />
+              </div>
+              <div>
+                <label>Sort Order</label>
+                <input name="sortOrder" type="number" value="0" required />
+              </div>
+            </div>
+            <label>
+              <input name="isActive" type="checkbox" checked />
+              Active
+            </label>
+            <button type="submit">Add Plan</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Menu Builder</h2>
+          <p class="muted">Use the built-in plans and support screens or create your own text and link buttons.</p>
+          <% menuItems.forEach((item) => { %>
+            <form method="post" action="/admin/menu-items">
+              <input type="hidden" name="id" value="<%= item.id %>" />
+              <div class="two-columns">
+                <div>
+                  <label>Label</label>
+                  <input name="label" value="<%= item.label %>" required />
+                </div>
+                <div>
+                  <label>Type</label>
+                  <select name="type">
+                    <% menuTypes.forEach((type) => { %>
+                      <option value="<%= type %>" <%= item.type === type ? "selected" : "" %>><%= type %></option>
+                    <% }) %>
+                  </select>
+                </div>
+              </div>
+              <label>Value</label>
+              <textarea name="value"><%= item.value %></textarea>
+              <div class="two-columns">
+                <div>
+                  <label>Sort Order</label>
+                  <input name="sortOrder" type="number" value="<%= item.sortOrder %>" required />
+                </div>
+                <div>
+                  <label>
+                    <input name="isActive" type="checkbox" <%= item.isActive ? "checked" : "" %> />
+                    Active
+                  </label>
+                </div>
+              </div>
+              <button type="submit">Save Menu Item</button>
+            </form>
+            <form method="post" action="/admin/menu-items/<%= item.id %>/delete">
+              <button type="submit" class="button-danger">Delete</button>
+            </form>
+            <hr />
+          <% }) %>
+
+          <h3>Add Menu Item</h3>
+          <form method="post" action="/admin/menu-items">
+            <label>Label</label>
+            <input name="label" required />
+            <label>Type</label>
+            <select name="type">
+              <% menuTypes.forEach((type) => { %>
+                <option value="<%= type %>"><%= type %></option>
+              <% }) %>
+            </select>
+            <label>Value</label>
+            <textarea name="value"></textarea>
+            <label>Sort Order</label>
+            <input name="sortOrder" type="number" value="0" required />
+            <label>
+              <input name="isActive" type="checkbox" checked />
+              Active
+            </label>
+            <button type="submit">Add Menu Item</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Payment Requests</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Plan</th>
+                <th>Proof</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% paymentRequests.forEach((request) => { %>
+                <tr>
+                  <td>
+                    <strong><%= request.fullName %></strong><br />
+                    <span class="muted"><%= request.username ? "@" + request.username : "no username" %> / <%= request.userId %></span>
+                  </td>
+                  <td><%= request.planName %></td>
+                  <td>
+                    <% if (request.proofType === "text") { %>
+                      <%= request.proofValue %>
+                    <% } else { %>
+                      <span class="muted"><%= request.proofType %> file_id</span><br />
+                      <%= request.proofValue %>
+                    <% } %>
+                  </td>
+                  <td>
+                    <span class="badge <%= request.status %>"><%= request.status %></span>
+                  </td>
+                  <td>
+                    <% if (request.status === "pending") { %>
+                      <div class="inline-actions">
+                        <form method="post" action="/admin/payments/<%= request.id %>/approve">
+                          <button type="submit">Approve</button>
+                        </form>
+                        <form method="post" action="/admin/payments/<%= request.id %>/reject">
+                          <button type="submit" class="button-danger">Reject</button>
+                        </form>
+                      </div>
+                    <% } else { %>
+                      <span class="muted">Reviewed</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
